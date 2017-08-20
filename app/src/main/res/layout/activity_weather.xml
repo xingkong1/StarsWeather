@@ -42,7 +42,6 @@
 
             <include layout="@layout/forecast"/>
 
-            <include layout="@layout/api"/>
 
             <include layout="@layout/suggestion"/>
 

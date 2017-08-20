@@ -16,6 +16,7 @@ public class City extends DataSupport {
 
     private int provinceId;
 
+
     public int getCityCode() {
         return cityCode;
     }
@@ -47,4 +48,5 @@ public class City extends DataSupport {
     public void setProvinceId(int provinceId) {
         this.provinceId = provinceId;
     }
+
 }
