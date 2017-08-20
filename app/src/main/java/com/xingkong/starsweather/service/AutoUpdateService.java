@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -15,6 +16,9 @@ import com.xingkong.starsweather.WeatherActivity;
 import com.xingkong.starsweather.gson.Weather;
 import com.xingkong.starsweather.util.HttpUtil;
 import com.xingkong.starsweather.util.Utility;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -57,8 +61,8 @@ public class AutoUpdateService extends Service {
             //有缓存时直接解析天气数据
             Weather weather= Utility.handleWeatherResponse(weatherString);
             String weatherId=weather.basic.weatherId;
-            String weatherUrl="http://guolin.tech/api/weather?cityid="+weatherId+
-                    "&key=3641ea7c9cde405daa16d2cc80a60ec0";
+            String weatherUrl="https://free-api.heweather.com/v5/weather?city="+
+                    weatherId+"&key=3641ea7c9cde405daa16d2cc80a60ec0";
             HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -85,7 +89,8 @@ public class AutoUpdateService extends Service {
      * 更新并应每日一图
      */
     private void updateBingPic(){
-        String requestBingPic="http://guolin.tech/api/bing_pic";
+        String requestBingPic="https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1";
+        final String baseUrl="http://cn.bing.com";
         HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -95,9 +100,22 @@ public class AutoUpdateService extends Service {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String bingPic=response.body().string();
+                String pic="";
+                Log.w("image","相片开始初始化");
+                Log.w("image",bingPic);
+                try{
+                    JSONObject jsonObject=new JSONObject(bingPic);
+                    JSONArray jsonArray= jsonObject.getJSONArray("images");
+                    String url=jsonArray.getJSONObject(0).getString("url");
+                    pic=baseUrl+url;
+                    Log.w("image",pic);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                final  String image=pic;
                 SharedPreferences.Editor editor=PreferenceManager.
                         getDefaultSharedPreferences(AutoUpdateService.this).edit();
-                editor.putString("bing_pic",bingPic);
+                editor.putString("bing_pic",image);
                 editor.apply();
             }
         });

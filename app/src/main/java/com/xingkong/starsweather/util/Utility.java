@@ -1,6 +1,7 @@
 package com.xingkong.starsweather.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.xingkong.starsweather.db.City;
@@ -92,8 +93,9 @@ public class Utility {
      */
     public static Weather handleWeatherResponse(String response){
         try {
+            Log.w("weather1",response);
             JSONObject jsonObject=new JSONObject(response);
-            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather5");
             String weatherContent=jsonArray.getJSONObject(0).toString();
             return  new Gson().fromJson(weatherContent,Weather.class);
         }catch (Exception e){

@@ -14,14 +14,17 @@ public class Suggestion {
     public Sport sport;
 
     public class Comfort{
+        public String brf;
         @SerializedName("txt")
         public String info;
     }
     public class Dresssg{
+        public String brf;
         @SerializedName("txt")
         public String info;
     }
     public class Sport{
+        public String brf;
         @SerializedName("txt")
         public String info;
     }

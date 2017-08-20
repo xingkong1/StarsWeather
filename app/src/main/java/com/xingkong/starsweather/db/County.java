@@ -47,4 +47,24 @@ public class County extends DataSupport {
     public void setWeatherId(String weatherId) {
         this.weatherId = weatherId;
     }
+
+    private String pm25;
+
+    private String qlty;
+
+    public String getPm25() {
+        return pm25;
+    }
+
+    public void setPm25(String pm25) {
+        this.pm25 = pm25;
+    }
+
+    public String getQlty() {
+        return qlty;
+    }
+
+    public void setQlty(String qlty) {
+        this.qlty = qlty;
+    }
 }

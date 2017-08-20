@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="15dp">
+    android:layout_margin="10dp">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/cloudy"
+        android:id="@+id/now_image"
+        />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60dp"
+        android:orientation="vertical">
 
     <TextView
         android:id="@+id/degree_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
+        android:layout_gravity="center_horizontal"
         android:textColor="#fff"
         android:textSize="60sp"/>
 
@@ -18,8 +33,26 @@
         android:id="@+id/weather_info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
+        android:layout_gravity="center_horizontal"
         android:textColor="#fff"
         android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/weather_temRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#fff"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/weather_air"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#fff"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
 
 </LinearLayout>
