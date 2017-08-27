@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent" android:background="#fff">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimaryDark"
+        android:padding="2dp">
 
         <TextView
             android:id="@+id/title_text"
@@ -18,12 +21,32 @@
 
         <Button
             android:id="@+id/back_button"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="2dp"
             android:layout_alignParentLeft="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_centerVertical="true"
             android:background="@drawable/ic_back"/>
+
+        <TextView
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="30dp"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:text="返回"
+            android:textColor="#fff"
+            android:textSize="17dp" />
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/city"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <ListView
@@ -31,4 +54,5 @@
         android:layout_height="match_parent"
         android:id="@+id/list_view"></ListView>
 
-</LinearLayout>
+
+    </LinearLayout>

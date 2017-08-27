@@ -20,12 +20,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.xingkong.starsweather.db.City;
 import com.xingkong.starsweather.db.County;
 import com.xingkong.starsweather.gson.AQI;
 import com.xingkong.starsweather.gson.Forecast;
 import com.xingkong.starsweather.gson.Weather;
+import com.xingkong.starsweather.service.AutoUpdateService;
 import com.xingkong.starsweather.util.HttpUtil;
+import com.xingkong.starsweather.util.Ifly;
 import com.xingkong.starsweather.util.Utility;
 
 import org.json.JSONArray;
@@ -34,6 +38,8 @@ import org.litepal.crud.DataSupport;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -81,6 +87,10 @@ public class WeatherActivity extends AppCompatActivity {
 
     private ImageView now_image;
 
+    private ImageView forecast_image;
+
+    private Ifly ifly;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +103,8 @@ public class WeatherActivity extends AppCompatActivity {
             );
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
+        SpeechUtility.createUtility(WeatherActivity.this, SpeechConstant.APPID + "=59993311");
+        ifly=new Ifly();
         setContentView(R.layout.activity_weather);
         //初始化各控件
         weatherLayout=(ScrollView)findViewById(R.id.weather_layout);
@@ -111,12 +123,14 @@ public class WeatherActivity extends AppCompatActivity {
         sportBrf=(TextView)findViewById(R.id.sport_brf);
         bingPicImg=(ImageView)findViewById(R.id.bing_pic_img);
         now_image=(ImageView)findViewById(R.id.now_image);
+        forecast_image=(ImageView)findViewById(R.id.forecast_image);
 
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
 
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         navButton=(Button)findViewById(R.id.nav_button);
+
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString=prefs.getString("weather",null);
         String bingPic=prefs.getString("bing_pic",null);
@@ -132,7 +146,6 @@ public class WeatherActivity extends AppCompatActivity {
         final String weatherId;
         if(weatherString!=null){
             //有缓存时直接解析天气数据
-            Log.w("huancun",weatherString);
             Weather weather= Utility.handleWeatherResponse(weatherString);
             weatherId=weather.basic.weatherId;
             showWeatherInfo(weather);
@@ -154,6 +167,33 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
+
+        forecast_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
+                String forecast= prefs.getString("forecast_",null);
+                if(forecast!=null){
+                    if(ifly.mTts==null){
+                        ifly.speak(forecast);
+                    }else if(ifly.mTts.isSpeaking()){
+                        if(ifly.status){
+                            ifly.mTts.pauseSpeaking();
+                            ifly.status=false;
+                        }else{
+                            ifly.mTts.resumeSpeaking();
+                            ifly.status=true;
+                        }
+                    }else if(ifly.mTts.destroy()){
+                        ifly.mTts.startSpeaking(forecast,null);
+                    }
+
+                }
+
+                broadcast();
             }
         });
     }
@@ -238,6 +278,7 @@ public class WeatherActivity extends AppCompatActivity {
                             }
                             editor.apply();
                             showWeatherInfo(weather);
+                            broadcast();
                         }else{
                             Toast.makeText(WeatherActivity.this,"获取天气信息失败",
                                     Toast.LENGTH_SHORT).show();
@@ -247,6 +288,7 @@ public class WeatherActivity extends AppCompatActivity {
                 });
             }
         });
+        ifly.mTts=null;
     }
 
     /**
@@ -259,14 +301,14 @@ public class WeatherActivity extends AppCompatActivity {
         String weatherInfo=weather.now.more.info;
         String air="";
         if(weather.aqi!=null) {
-                air = "PM2.5：" + weather.aqi.city.pm25 + "  ";
+                //air = "PM2.5：" + weather.aqi.city.pm25 + " ";
                 air = air + "空气质量：" + weather.aqi.city.qlty;
         }else{
             List<County> countyList= DataSupport.where("weatherid=?",weather.basic.weatherId).find(County.class);
             if(countyList!=null&&!countyList.isEmpty()) {
                 County county=countyList.get(0);
                 if(county.getPm25()!=null&&county.getQlty()!=null) {
-                    air = "PM2.5：" + county.getPm25() + "  ";
+                    //air = "PM2.5：" + county.getPm25() + "  ";
                     air = air + "空气质量：" + county.getQlty();
                 }
             }
@@ -310,11 +352,7 @@ public class WeatherActivity extends AppCompatActivity {
             TextView dateText=(TextView)view.findViewById(R.id.date_text);
             TextView infoText=(TextView)view.findViewById(R.id.info_text);
             TextView rangeText=(TextView)view.findViewById(R.id.range);
-            if(i==1){
-                dateText.setText(forecast.date+" 明天");
-            }else if(i==2){
-                dateText.setText(forecast.date+" 后天");
-            }
+            dateText.setText(getWeekOfDate(forecast.date));
             infoText.setText(forecast.more.info);
             rangeText.setText(forecast.temperature.max+"°"+"/"+forecast.temperature.min+"°");
             forecastLayout.addView(view);
@@ -332,6 +370,49 @@ public class WeatherActivity extends AppCompatActivity {
         drsgBrf.setText(drsg_brf);
         sportBrf.setText(sport_brf);
         weatherLayout.setVisibility(View.VISIBLE);
+    }
+
+    private  void broadcast(){
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString=prefs.getString("weather",null);
+        String text="";
+        if(weatherString!=null){
+            Weather weather=Utility.handleWeatherResponse(weatherString);
+            text+=weather.basic.cityName+":";
+            text+="今天是"+getWeekOfDate(weather.forecastList.get(0).date)+",";
+            text+="是一个"+weather.now.more.info+"天";
+            text+="今天最高温度为"+weather.forecastList.get(0).temperature.max+"摄氏度，";
+            text+="最低温度为"+weather.forecastList.get(0).temperature.min+"摄氏度。";
+            text+="当前室外温度为"+weather.now.temperature+"摄氏度,";
+            text+="相对湿度为百分之"+weather.now.hum+",";
+            text+=weather.now.wind.dir+weather.now.wind.sc+"级。";
+            if(weather.aqi!=null) {
+                text+="空气质量为"+weather.aqi.city.qlty+",PM2.5含量为"+weather.aqi.city.pm25+"。";
+            }
+            text+="给您一些生活小建议：";
+            text+=weather.suggestion.comfort.info+"。";
+            text+=weather.suggestion.dresssg.info+"。";
+            text+=weather.suggestion.sport.info+"。";
+            text+=weather.suggestion.sunny.info+"。";
+            SharedPreferences.Editor editor=
+                    PreferenceManager.
+                            getDefaultSharedPreferences(this).edit();
+            editor.putString("forecast",text);
+            editor.apply();
+        }
+    }
+
+    private String getWeekOfDate(String dataText){
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date=format.parse(dataText);
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("EEEE");
+            String week=simpleDateFormat.format(date);
+            return dataText+" "+week;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dataText;
     }
 
 

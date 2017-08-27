@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.xingkong.starsweather.WeatherActivity;
 import com.xingkong.starsweather.gson.Weather;
 import com.xingkong.starsweather.util.HttpUtil;
+import com.xingkong.starsweather.util.SharePrefsManager;
 import com.xingkong.starsweather.util.Utility;
 
 import org.json.JSONArray;
@@ -27,6 +28,9 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class AutoUpdateService extends Service {
+
+
+
     public AutoUpdateService() {
 
     }
@@ -39,10 +43,19 @@ public class AutoUpdateService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        updateWeather();
-        updateBingPic();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                updateWeather();
+                updateBingPic();
+            }
+        }).start();
         AlarmManager manager=(AlarmManager)getSystemService(ALARM_SERVICE);
-        int anHour=8*60*60*1000;
+        String time= SharePrefsManager.getString("interval");
+        int anHour=1*60*60*1000;
+        if(time!=null){
+            anHour=anHour*Integer.parseInt(time.substring(0,1));
+        }
         long triggerAtTime= SystemClock.elapsedRealtime()+anHour;
         Intent intent1=new Intent(this,AutoUpdateService.class);
         PendingIntent pi=PendingIntent.getService(this,0,intent1,0);

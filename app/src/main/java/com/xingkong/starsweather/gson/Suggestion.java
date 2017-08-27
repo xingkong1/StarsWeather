@@ -12,6 +12,8 @@ public class Suggestion {
     @SerializedName("drsg")
     public Dresssg dresssg;
     public Sport sport;
+    @SerializedName("uv")
+    public Sunny sunny;
 
     public class Comfort{
         public String brf;
@@ -24,6 +26,12 @@ public class Suggestion {
         public String info;
     }
     public class Sport{
+        public String brf;
+        @SerializedName("txt")
+        public String info;
+    }
+
+    public class Sunny{
         public String brf;
         @SerializedName("txt")
         public String info;
