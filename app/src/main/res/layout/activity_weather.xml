@@ -17,8 +17,6 @@
         android:layout_height="match_parent"
         android:id="@+id/drawer_layout">
 
-
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -39,11 +37,9 @@
 
             <include layout="@layout/title"/>
 
-
             <include layout="@layout/now"/>
 
             <include layout="@layout/forecast"/>
-
 
             <include layout="@layout/suggestion"/>
 

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.xingkong.starsweather.db.City;
 import com.xingkong.starsweather.db.County;
 import com.xingkong.starsweather.db.Province;
+import com.xingkong.starsweather.service.AutoUpdateService;
 import com.xingkong.starsweather.util.HttpUtil;
 import com.xingkong.starsweather.util.Ifly;
 import com.xingkong.starsweather.util.MyApplication;
@@ -82,6 +83,8 @@ public class ChooseAreaFragment extends Fragment {
 
     private Button addButton;
 
+    private TextView back_text;
+
 
     @Nullable
     @Override
@@ -89,6 +92,7 @@ public class ChooseAreaFragment extends Fragment {
        View view=inflater.inflate(R.layout.choose_area,container,false);
         titleText=(TextView)view.findViewById(R.id.title_text);
         backButton=(Button)view.findViewById(R.id.back_button);
+        back_text=(TextView)view.findViewById(R.id.back_text);
         addButton=(Button)view.findViewById(R.id.add_button);
         listView=(ListView)view.findViewById(R.id.list_view);
         adapter=new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,dataList);
@@ -122,6 +126,8 @@ public class ChooseAreaFragment extends Fragment {
                         edit.putString("weatherIds",weatherId+"/"+countyName);
                         edit.commit();
                         startActivity(intent);
+                        Intent intent1=new Intent(getActivity(), AutoUpdateService.class);
+                        getActivity().startService(intent1);
                         getActivity().finish();
                     }else if(getActivity() instanceof ViewPagerFragment){
                         ViewPagerFragment viewPagerFragment=(ViewPagerFragment)getActivity();
@@ -133,7 +139,6 @@ public class ChooseAreaFragment extends Fragment {
                         edit.putString("weatherIds",weatherIds+","+weatherId+"/"+countyName);
                         edit.commit();
                         ((ViewPagerFragment)getActivity()).add(weatherId);
-
                         cityMannager();
                     }
 
@@ -279,6 +284,8 @@ public class ChooseAreaFragment extends Fragment {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String weatherIds=prefs.getString("weatherIds",null);
         if(weatherIds==null){
+            backButton.setVisibility(View.GONE);
+            back_text.setVisibility(View.GONE);
             queryProvinces();
         }else{
             titleText.setText("城市管理");
@@ -333,6 +340,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCities(){
         titleText.setText(selectedProvince.getProvinceName());
         backButton.setVisibility(View.VISIBLE);
+        back_text.setVisibility(View.VISIBLE);
         cityList=DataSupport.where("provinceid=?",
                 String.valueOf(selectedProvince.getId())).find(City.class);
         if(cityList.size()>0){
