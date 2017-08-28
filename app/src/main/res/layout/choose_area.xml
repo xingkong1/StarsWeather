@@ -7,45 +7,38 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimaryDark">
 
         <TextView
             android:id="@+id/title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:textColor="#fff"
             android:textSize="20sp"/>
 
         <Button
             android:id="@+id/back_button"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginLeft="10dp"
+           android:layout_centerVertical="true"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/ic_back" />
 
-        <TextView
-            android:id="@+id/back_text"
-            android:layout_marginLeft="35dp"
-            android:layout_marginTop="36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="返回"
-            android:textColor="#fff"
-            android:textSize="15dp" />
+
 
         <Button
             android:id="@+id/add_button"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="15dp"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="28dp"
-            android:background="@drawable/city"
+            android:layout_centerVertical="true"
+            android:background="@drawable/append"
             android:visibility="gone"/>
+
     </RelativeLayout>
 
 

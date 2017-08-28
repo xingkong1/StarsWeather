@@ -27,7 +27,6 @@ import com.xingkong.starsweather.db.County;
 import com.xingkong.starsweather.db.Province;
 import com.xingkong.starsweather.service.AutoUpdateService;
 import com.xingkong.starsweather.util.HttpUtil;
-import com.xingkong.starsweather.util.Ifly;
 import com.xingkong.starsweather.util.MyApplication;
 import com.xingkong.starsweather.util.Utility;
 
@@ -43,11 +42,11 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
- * 用于遍历省市县数据的碎片
- * Created by 17273 on 2017/8/13.
+ * 城市管理的碎片
+ * Created by 17273 on 2017/8/28.
  */
 
-public class ChooseAreaFragment extends Fragment {
+public class ManageAreaFragment extends Fragment {
 
     public static  final  int LEVEL_MANAGER=0;
 
@@ -83,15 +82,15 @@ public class ChooseAreaFragment extends Fragment {
 
     private Button addButton;
 
-    private TextView back_text;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-       View view=inflater.inflate(R.layout.choose_area,container,false);
+        View view=inflater.inflate(R.layout.choose_area,container,false);
         titleText=(TextView)view.findViewById(R.id.title_text);
         backButton=(Button)view.findViewById(R.id.back_button);
+        addButton=(Button)view.findViewById(R.id.add_button);
         listView=(ListView)view.findViewById(R.id.list_view);
         adapter=new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,dataList);
         listView.setAdapter(adapter);
@@ -101,11 +100,15 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        queryProvinces();
+        cityMannager();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(currentLevel==LEVEL_PROVINCE){
+                if(currentLevel==LEVEL_MANAGER){
+                    Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
+                    intent.putExtra("position",position);
+                    startActivity(intent);
+                } else if(currentLevel==LEVEL_PROVINCE){
                     selectedProvince=provinceList.get(position);
                     queryCities();
                 }else if(currentLevel==LEVEL_CITY){
@@ -114,17 +117,6 @@ public class ChooseAreaFragment extends Fragment {
                 }else if(currentLevel==LEVEL_COUNTY){
                     String weatherId=countyList.get(position).getWeatherId();
                     String countyName=countyList.get(position).getCountyName();
-                    if(getActivity() instanceof MainActivity){
-                        Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
-                        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
-                        SharedPreferences.Editor edit=prefs.edit();
-                        edit.putString("weatherIds",weatherId+"/"+countyName);
-                        edit.commit();
-                        startActivity(intent);
-                        Intent intent1=new Intent(getActivity(), AutoUpdateService.class);
-                        getActivity().startService(intent1);
-                        getActivity().finish();
-                    }else if(getActivity() instanceof AddAreaActivity){
                         Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
                         intent.putExtra("position",position+1);
                         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
@@ -137,8 +129,51 @@ public class ChooseAreaFragment extends Fragment {
                         }
                         edit.commit();
                         startActivity(intent);
-                    }
+                }
+            }
+        });
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                final String countyName=dataList.get(position);
+                if (currentLevel == LEVEL_MANAGER) {
+                    AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
+                    dialog.setTitle("城市管理");
+                    dialog.setMessage("确定删除？");
+                    dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+                            String weatherIds=prefs.getString("weatherIds",null);
+                            if((!weatherIds.isEmpty())&&weatherIds.contains(",")){
+                                String[] weathers= weatherIds.split(",");
+                                for(String w:weathers){
+                                    if(w.contains(countyName))
+                                        weatherIds= weatherIds.replace(","+w,"");
+                                }
+                            }else{
+                                weatherIds=null;
+                            }
+                            SharedPreferences.Editor edit= prefs.edit();
+                            edit.putString("weatherIds",weatherIds);
+                            edit.commit();
+                            dataList.remove(position);
+                            adapter.notifyDataSetChanged();
+                            listView.setSelection(0);
+
+                        }
+                    });
+                    dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+                    return true;
+                }else{
+                    return false;
                 }
             }
         });
@@ -151,7 +186,9 @@ public class ChooseAreaFragment extends Fragment {
                 }else if(currentLevel==LEVEL_CITY){
                     queryProvinces();
                 }else if(currentLevel==LEVEL_PROVINCE){
-                      getActivity().finish();
+                    cityMannager();
+                }else if(currentLevel==LEVEL_MANAGER){
+                    getActivity().finish();
                 }
             }
         });
@@ -182,7 +219,7 @@ public class ChooseAreaFragment extends Fragment {
      * 根据传入的地址和类型从服务器上查询省市县数据
      */
     private void queryFormServer(String address,final String type){
-         showProgressDialog();
+        showProgressDialog();
         HttpUtil.sendOkHttpRequest(address, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -226,6 +263,40 @@ public class ChooseAreaFragment extends Fragment {
 
     }
 
+    /**
+     * 城市管理
+     */
+    private void cityMannager(){
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        String weatherIds=prefs.getString("weatherIds",null);
+        if(weatherIds==null){
+            backButton.setVisibility(View.GONE);
+            queryProvinces();
+        }else{
+            titleText.setText("城市管理");
+            addButton.setVisibility(View.VISIBLE);
+            addButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    addButton.setVisibility(View.GONE);
+                    queryProvinces();
+                }
+            });
+            dataList.clear();
+            if(!weatherIds.isEmpty()&&weatherIds.contains(",")){
+                List<String> weathers= Arrays.asList(weatherIds.split(","));
+                for(String weather:weathers){
+                    dataList.add(weather.split("/")[1]);
+                    Log.w("weatherIds",weather.split("/")[1]);
+                }
+            }else{
+                dataList.add(weatherIds.split("/")[1]);
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            currentLevel=LEVEL_MANAGER;
+        }
+    }
 
     /**
      * 查询全国所以的省，优先从数据库查询，如果没有查询再去服务器上查询
@@ -244,7 +315,7 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel=LEVEL_PROVINCE;
         }else {
             String address="http://guolin.tech/api/china";
-             queryFormServer(address,"province");
+            queryFormServer(address,"province");
         }
     }
 
@@ -295,3 +366,4 @@ public class ChooseAreaFragment extends Fragment {
         }
     }
 }
+

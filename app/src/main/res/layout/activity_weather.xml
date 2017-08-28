@@ -52,8 +52,8 @@
         <fragment
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/choose_area_fragment"
-            android:name="com.xingkong.starsweather.ChooseAreaFragment"
+            android:id="@+id/menu_fragment"
+            android:name="com.xingkong.starsweather.MenuFragment"
             android:layout_gravity="start"/>
 
     </android.support.v4.widget.DrawerLayout>

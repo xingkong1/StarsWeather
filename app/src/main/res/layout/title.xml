@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-
-    android:layout_height="75dp">
+    android:layout_height="?attr/actionBarSize"
+    android:layout_marginTop="10dp">
 
     <Button
         android:layout_width="30dp"
@@ -10,7 +10,7 @@
         android:id="@+id/nav_button"
         android:layout_marginLeft="10dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="30dp"
+        android:layout_centerVertical="true"
         android:background="@drawable/ic_home"/>
 
     <TextView
@@ -18,18 +18,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp"
+        android:layout_centerVertical="true"
         android:textColor="#030303"
         android:textSize="25sp"/>
-
-    <Button
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/setting_button"
-        android:layout_marginRight="15dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/set"/>
 
 
 </RelativeLayout>

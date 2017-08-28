@@ -88,8 +88,6 @@ public class WeatherFragment extends Fragment {
 
     private Button navButton;
 
-    private Button settingButton;
-
     private View view;
 
     private ImageView now_image;
@@ -101,7 +99,6 @@ public class WeatherFragment extends Fragment {
     private Weather weather;
 
     private Ifly ifly;
-
 
 
     public WeatherFragment(){
@@ -164,7 +161,6 @@ public class WeatherFragment extends Fragment {
 
         drawerLayout=(DrawerLayout)view.findViewById(R.id.drawer_layout);
         navButton=(Button)view.findViewById(R.id.nav_button);
-        settingButton=(Button)view.findViewById(R.id.setting_button);
 
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String weatherString=prefs.getString("weather_"+weatherId,null);
@@ -196,14 +192,6 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
-
-        settingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getActivity(),SettingActivity.class);
-                startActivity(intent);
             }
         });
 

@@ -25,6 +25,7 @@ import java.util.List;
 
 public class ViewPagerFragment extends FragmentActivity {
 
+
     private ViewPager viewPager;
 
     private LinearLayout numLayout;
@@ -38,6 +39,8 @@ public class ViewPagerFragment extends FragmentActivity {
     public ViewPager getViewPager(){
         return viewPager;
     }
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +68,11 @@ public class ViewPagerFragment extends FragmentActivity {
 
         viewPager.setAdapter(adapter);
 
+        String position=getIntent().getStringExtra("position");
 
+         if(position!=null){
+             viewPager.setCurrentItem(Integer.parseInt(position));
+         }
 
         /**
         FrameLayout viewGroup= (FrameLayout) (LayoutInflater.from(MyApplication.getContext()).inflate(R.layout.activity_weather,null));
@@ -84,7 +91,7 @@ public class ViewPagerFragment extends FragmentActivity {
          */
     }
 
-    public void add(String weatherId){
+    public  void  add(String weatherId){
          weatherIds.add(weatherId);
         adapter.updateDate(weatherIds);
         viewPager.setCurrentItem(weatherId.length()-1);

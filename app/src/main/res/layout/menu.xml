@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#fff">
 
     <ImageView
         android:layout_width="match_parent"
@@ -14,7 +15,8 @@
     <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp">
+    android:layout_margin="15dp"
+        android:id="@+id/city_add">
 
     <ImageView
         android:layout_width="30dp"
@@ -25,19 +27,27 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
+        android:layout_marginLeft="50dp"
         android:layout_gravity="center_vertical"
         android:text="添加城市"
-        android:textSize="24dp"
+        android:textSize="20dp"
+        android:textColor="#000000"
         />
 
 </LinearLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#C0C0C0"
+        />
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp">
+        android:layout_margin="15dp"
+        android:id="@+id/city_manage">
 
         <ImageView
             android:layout_width="30dp"
@@ -48,10 +58,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
+            android:layout_marginLeft="50dp"
             android:layout_gravity="center_vertical"
             android:text="城市管理"
-            android:textSize="24dp"
+            android:textSize="20dp"
+            android:textColor="#000000"
             />
 
     </LinearLayout>
@@ -67,15 +78,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="星空天气"
-        android:layout_margin="20dp"
-        android:textSize="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="22dp"
         />
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp">
+        android:layout_margin="15dp"
+        android:id="@+id/setting">
 
         <ImageView
             android:layout_width="30dp"
@@ -86,10 +100,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
+            android:layout_marginLeft="50dp"
             android:layout_gravity="center_vertical"
             android:text="设置"
-            android:textSize="24dp"
+            android:textSize="20dp"
+            android:textColor="#000000"
             />
 
     </LinearLayout>
@@ -98,24 +113,27 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp">
+        android:layout_margin="15dp"
+        android:id="@+id/about">
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginLeft="20dp"
-            android:src="@drawable/set" />
+            android:src="@drawable/about" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
+            android:layout_marginLeft="50dp"
             android:layout_gravity="center_vertical"
             android:text="关于"
-            android:textSize="24dp"
+            android:textSize="20dp"
+            android:textColor="#000000"
             />
 
     </LinearLayout>
+
 
 
 </LinearLayout>
