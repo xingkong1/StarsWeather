@@ -53,7 +53,8 @@
             android:exported="true" />
 
         <activity android:name=".AddAreaActivity" />
-        <activity android:name=".ManageAreaActivity"></activity>
+        <activity android:name=".ManageAreaActivity" />
+        <activity android:name=".AboutActivity"></activity>
     </application>
 
 </manifest>

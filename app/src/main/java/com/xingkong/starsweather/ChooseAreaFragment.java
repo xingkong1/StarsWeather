@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,8 +51,6 @@ import okhttp3.Response;
 
 public class ChooseAreaFragment extends Fragment {
 
-    public static  final  int LEVEL_MANAGER=0;
-
     public static final int LEVEL_PROVINCE=1;
 
     public  static final int LEVEL_CITY=2;
@@ -65,7 +65,7 @@ public class ChooseAreaFragment extends Fragment {
 
     private ListView listView;
 
-    private ArrayAdapter<String> adapter;
+    private MyAdapter adapter;
 
     private List<String> dataList=new ArrayList<>();
 
@@ -93,7 +93,7 @@ public class ChooseAreaFragment extends Fragment {
         titleText=(TextView)view.findViewById(R.id.title_text);
         backButton=(Button)view.findViewById(R.id.back_button);
         listView=(ListView)view.findViewById(R.id.list_view);
-        adapter=new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,dataList);
+        adapter=new MyAdapter();
         listView.setAdapter(adapter);
         return view;
     }
@@ -126,7 +126,7 @@ public class ChooseAreaFragment extends Fragment {
                         getActivity().finish();
                     }else if(getActivity() instanceof AddAreaActivity){
                         Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
-                        intent.putExtra("position",position+1);
+                        intent.putExtra("position",weatherId);
                         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
                         String weatherIds=prefs.getString("weatherIds",null);
                         SharedPreferences.Editor edit=prefs.edit();
@@ -294,4 +294,48 @@ public class ChooseAreaFragment extends Fragment {
             queryFormServer(address,"county");
         }
     }
+
+    public class MyAdapter extends BaseAdapter{
+
+        private LayoutInflater layoutInflater=LayoutInflater.from(MyApplication.getContext());
+
+
+
+        @Override
+        public int getCount() {
+            return dataList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder=null;
+            if(convertView==null){
+               viewHolder=new ViewHolder();
+                convertView=layoutInflater.inflate(R.layout.city_item,null);
+                viewHolder.image=(ImageView)convertView.findViewById(R.id.city_image);
+                viewHolder.text=(TextView)convertView.findViewById(R.id.city_name);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder=(ViewHolder)convertView.getTag();
+            }
+            viewHolder.text.setText(dataList.get(position));
+            return convertView;
+        }
+    }
+
+    public final class  ViewHolder{
+        public ImageView image;
+        public TextView text;
+    }
+
 }

@@ -105,9 +105,8 @@ public class ManageAreaFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(currentLevel==LEVEL_MANAGER){
-                    Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
-                    intent.putExtra("position",position);
-                    startActivity(intent);
+                    ViewPagerFragment.getViewPager().setCurrentItem(position);
+                    getActivity().finish();
                 } else if(currentLevel==LEVEL_PROVINCE){
                     selectedProvince=provinceList.get(position);
                     queryCities();
@@ -117,8 +116,8 @@ public class ManageAreaFragment extends Fragment {
                 }else if(currentLevel==LEVEL_COUNTY){
                     String weatherId=countyList.get(position).getWeatherId();
                     String countyName=countyList.get(position).getCountyName();
-                        Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
-                        intent.putExtra("position",position+1);
+                       Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
+                        intent.putExtra("position",weatherId);
                         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
                         String weatherIds=prefs.getString("weatherIds",null);
                         SharedPreferences.Editor edit=prefs.edit();

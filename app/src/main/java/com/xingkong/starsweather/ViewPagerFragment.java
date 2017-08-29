@@ -26,18 +26,42 @@ import java.util.List;
 public class ViewPagerFragment extends FragmentActivity {
 
 
-    private ViewPager viewPager;
+    private static ViewPager viewPager;
 
     private LinearLayout numLayout;
 
-    private MyPagerAdapter adapter;
+    private   MyPagerAdapter adapter;
 
-     private List<String> weatherIds;
+     private  List<String> weatherIds;
 
     private List<String> countyNames;
 
-    public ViewPager getViewPager(){
+    public static ViewPager getViewPager(){
         return viewPager;
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+        String ids=prefs.getString("weatherIds",null);
+        List<String> weatherList=new ArrayList<>();
+        if(ids!=null){
+            if(ids.contains(",")){
+                List<String> weathers=Arrays.asList(ids.split(","));
+                for(String weather:weathers){
+                    weatherList.add(weather.split("/")[0]);
+                }
+            }else{
+                weatherList.add(ids.split("/")[0]);
+            }
+        }
+        if(weatherList.size()==weatherIds.size()){
+            return;
+        }else{
+            adapter.updateDate(weatherList);
+        }
+
     }
 
 
@@ -71,7 +95,9 @@ public class ViewPagerFragment extends FragmentActivity {
         String position=getIntent().getStringExtra("position");
 
          if(position!=null){
-             viewPager.setCurrentItem(Integer.parseInt(position));
+             viewPager.setCurrentItem(weatherIds.indexOf(position));
+         }else{
+             viewPager.setCurrentItem(0);
          }
 
         /**
