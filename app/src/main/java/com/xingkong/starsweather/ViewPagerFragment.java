@@ -1,5 +1,8 @@
 package com.xingkong.starsweather;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.widget.LinearLayout;
 
@@ -35,6 +39,8 @@ public class ViewPagerFragment extends FragmentActivity {
      private  List<String> weatherIds;
 
     private List<String> countyNames;
+
+    public  NotificationManager manager;
 
     public static ViewPager getViewPager(){
         return viewPager;
@@ -100,6 +106,8 @@ public class ViewPagerFragment extends FragmentActivity {
              viewPager.setCurrentItem(0);
          }
 
+
+
         /**
         FrameLayout viewGroup= (FrameLayout) (LayoutInflater.from(MyApplication.getContext()).inflate(R.layout.activity_weather,null));
         numLayout=(LinearLayout) viewGroup.findViewById(R.id.llGuideGroup);
@@ -164,6 +172,10 @@ public class ViewPagerFragment extends FragmentActivity {
                 fragments.add(fragment);
             }
             setFragments(fragments);
+        }
+
+        private  Fragment getFragment(int position){
+            return mFragmentList.get(position);
         }
 
         private void setFragments(ArrayList<Fragment> fragments){

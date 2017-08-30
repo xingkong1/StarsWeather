@@ -1,8 +1,11 @@
 package com.xingkong.starsweather.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -28,14 +31,11 @@ public class Ifly {
 
     public  boolean status=true;
 
-
-
     /**
      * 语音识别
      * @param context
      */
-    public static void Dialoginit(final Context context){
-        final String text="";
+    public static void Dialoginit(final Context context, final EditText text){
         RecognizerDialog mDialog=new RecognizerDialog(context,null);
         //2.设置accent、language等参数
         mDialog.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
@@ -46,8 +46,13 @@ public class Ifly {
             public void onResult(RecognizerResult recognizerResult, boolean isLast) {
                 if (!isLast) {
                     //解析语音
-                    String result = parseJson(recognizerResult.getResultString());
-
+                    final String result = parseJson(recognizerResult.getResultString());
+                    ((FragmentActivity)context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            text.setText(result);
+                        }
+                    });
                 }
             }
 

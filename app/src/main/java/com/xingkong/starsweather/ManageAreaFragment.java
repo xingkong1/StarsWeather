@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,7 +66,7 @@ public class ManageAreaFragment extends Fragment {
 
     private ListView listView;
 
-    private ArrayAdapter<String> adapter;
+    private MyAdapter adapter;
 
     private List<String> dataList=new ArrayList<>();
 
@@ -92,7 +94,7 @@ public class ManageAreaFragment extends Fragment {
         backButton=(Button)view.findViewById(R.id.back_button);
         addButton=(Button)view.findViewById(R.id.add_button);
         listView=(ListView)view.findViewById(R.id.list_view);
-        adapter=new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,dataList);
+        adapter=new MyAdapter();
         listView.setAdapter(adapter);
         return view;
     }
@@ -286,7 +288,6 @@ public class ManageAreaFragment extends Fragment {
                 List<String> weathers= Arrays.asList(weatherIds.split(","));
                 for(String weather:weathers){
                     dataList.add(weather.split("/")[1]);
-                    Log.w("weatherIds",weather.split("/")[1]);
                 }
             }else{
                 dataList.add(weatherIds.split("/")[1]);
@@ -363,6 +364,49 @@ public class ManageAreaFragment extends Fragment {
             String address="http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
             queryFormServer(address,"county");
         }
+    }
+
+    public  class MyAdapter extends BaseAdapter {
+
+        private LayoutInflater layoutInflater=LayoutInflater.from(MyApplication.getContext());
+
+
+
+        @Override
+        public int getCount() {
+            return dataList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+           ViewHolder viewHolder=null;
+            if(convertView==null){
+                viewHolder=new ViewHolder();
+                convertView=layoutInflater.inflate(R.layout.city_item,null);
+                viewHolder.image=(ImageView)convertView.findViewById(R.id.city_image);
+                viewHolder.text=(TextView)convertView.findViewById(R.id.city_name);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder=(ViewHolder)convertView.getTag();
+            }
+            viewHolder.text.setText(dataList.get(position));
+            return convertView;
+        }
+    }
+
+    public final class  ViewHolder{
+        public ImageView image;
+        public TextView text;
     }
 }
 

@@ -6,6 +6,7 @@
 
 
     <RelativeLayout
+        android:id="@+id/title_frame"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimaryDark">
@@ -40,6 +41,75 @@
             android:visibility="gone"/>
 
     </RelativeLayout>
+    
+    <LinearLayout
+        android:id="@+id/search_frame"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:orientation="vertical"
+        android:background="@drawable/wushi"
+        android:visibility="gone"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="所谓伊人，在水一方"
+            android:textSize="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="150dp"
+            android:textColor="#000"/>
+
+        <LinearLayout
+            android:layout_width="260dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/search_frame"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_gravity="center_vertical"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="12dp"
+                android:src="@drawable/search_btn_background" />
+
+            <EditText
+                android:id="@+id/search_text"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:background="@null"
+                android:hint="输入查询城市"
+                android:singleLine="true"
+                android:textColorHint="#808080"
+                android:textSize="15sp"
+                />
+
+            <ImageView
+                android:id="@+id/search_button"
+                android:layout_gravity="center_vertical"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/mic"
+                />
+
+            <ImageView
+                android:id="@+id/delete_button"
+                android:layout_gravity="center_vertical"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/delete"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 
 

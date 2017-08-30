@@ -1,13 +1,18 @@
 package com.xingkong.starsweather;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -100,6 +105,10 @@ public class WeatherFragment extends Fragment {
 
     private Ifly ifly;
 
+    private NotificationCompat.Builder builder;
+
+    public Notification notification;
+
 
     public WeatherFragment(){
 
@@ -180,6 +189,10 @@ public class WeatherFragment extends Fragment {
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
         }
+
+         builder=new NotificationCompat.Builder(getContext());
+
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
 
             @Override
@@ -391,6 +404,43 @@ public class WeatherFragment extends Fragment {
         drsgBrf.setText(drsg_brf);
         sportBrf.setText(sport_brf);
         weatherLayout.setVisibility(View.VISIBLE);
+
+        if(builder!=null){
+            builder.setContentTitle(weatherInfo+"  "+degree);
+            builder.setContentText(range);
+            builder.setWhen(System.currentTimeMillis());
+            switch (weatherInfo){
+                case "晴":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.sunny));
+                    break;
+                case "多云":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.cloudy));
+                    break;
+                case "阴":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.cloudy));
+                    break;
+                case "大雨":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.heavy_rain));
+                    break;
+                case "阵雨":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.thundershower));
+                    break;
+                case "雪":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.snow));
+                    break;
+            }
+            notification=builder.build();
+            NotificationManager manager=(NotificationManager)getContext().getSystemService(
+                    Context.NOTIFICATION_SERVICE);
+            manager.notify(1,notification);
+
+        }
     }
 
     private  void broadcast(Weather weather){

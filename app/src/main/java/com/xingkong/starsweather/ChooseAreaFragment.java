@@ -11,22 +11,29 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xingkong.starsweather.db.City;
 import com.xingkong.starsweather.db.County;
 import com.xingkong.starsweather.db.Province;
+import com.xingkong.starsweather.gson.Weather;
 import com.xingkong.starsweather.service.AutoUpdateService;
 import com.xingkong.starsweather.util.HttpUtil;
 import com.xingkong.starsweather.util.Ifly;
@@ -50,6 +57,8 @@ import okhttp3.Response;
  */
 
 public class ChooseAreaFragment extends Fragment {
+
+    public static final int LEVEL_SEARCH=0;
 
     public static final int LEVEL_PROVINCE=1;
 
@@ -81,9 +90,20 @@ public class ChooseAreaFragment extends Fragment {
 
     private int currentLevel;
 
-    private Button addButton;
+    private EditText search_text;
 
-    private TextView back_text;
+    private ImageView search_button;
+
+    private ImageView delete_button;
+
+    private Weather selectWeather;
+
+    private LinearLayout seach_frame;
+
+   // private LinearLayout.LayoutParams linearParams ;
+
+    private RelativeLayout title_frame;
+
 
 
     @Nullable
@@ -93,6 +113,12 @@ public class ChooseAreaFragment extends Fragment {
         titleText=(TextView)view.findViewById(R.id.title_text);
         backButton=(Button)view.findViewById(R.id.back_button);
         listView=(ListView)view.findViewById(R.id.list_view);
+        search_text=(EditText)view.findViewById(R.id.search_text);
+        search_button=(ImageView)view.findViewById(R.id.search_button);
+        delete_button=(ImageView)view.findViewById(R.id.delete_button);
+        seach_frame=(LinearLayout)view.findViewById(R.id.search_frame);
+        //linearParams =(LinearLayout.LayoutParams) seach_frame.getLayoutParams();
+        title_frame=(RelativeLayout)view.findViewById(R.id.title_frame);
         adapter=new MyAdapter();
         listView.setAdapter(adapter);
         return view;
@@ -101,11 +127,15 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        title_frame.setVisibility(View.GONE);
+        seach_frame.setVisibility(View.VISIBLE);
         queryProvinces();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(currentLevel==LEVEL_PROVINCE){
+                    title_frame.setVisibility(View.VISIBLE);
+                    seach_frame.setVisibility(View.GONE);
                     selectedProvince=provinceList.get(position);
                     queryCities();
                 }else if(currentLevel==LEVEL_CITY){
@@ -139,6 +169,23 @@ public class ChooseAreaFragment extends Fragment {
                         startActivity(intent);
                     }
 
+                }else if(currentLevel==LEVEL_SEARCH){
+                    if(selectWeather!=null){
+                        String weatherId=selectWeather.basic.weatherId;
+                        String countyName=selectWeather.basic.cityName;
+                        Intent intent=new Intent(getActivity(),ViewPagerFragment.class);
+                        intent.putExtra("position",weatherId);
+                        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
+                        String weatherIds=prefs.getString("weatherIds",null);
+                        SharedPreferences.Editor edit=prefs.edit();
+                        if(weatherIds==null){
+                            edit.putString("weatherIds",weatherId+"/"+countyName);
+                        }else{
+                            edit.putString("weatherIds",weatherIds+","+weatherId+"/"+countyName);
+                        }
+                        edit.commit();
+                        startActivity(intent);
+                    }
                 }
             }
         });
@@ -149,13 +196,127 @@ public class ChooseAreaFragment extends Fragment {
                 if(currentLevel==LEVEL_COUNTY){
                     queryCities();
                 }else if(currentLevel==LEVEL_CITY){
+                    seach_frame.setVisibility(View.VISIBLE);
+                    title_frame.setVisibility(View.GONE);
                     queryProvinces();
                 }else if(currentLevel==LEVEL_PROVINCE){
                       getActivity().finish();
                 }
             }
         });
+
+
+        search_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(final Editable s) {
+                if(s.length()>0){
+                    search_button.setVisibility(View.GONE);
+                    delete_button.setVisibility(View.VISIBLE);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            search(s.toString().trim());
+                        }
+                    }).start();
+                }else{
+                    search_button.setVisibility(View.VISIBLE);
+                    delete_button.setVisibility(View.GONE);
+                    queryProvinces();
+                }
+            }
+        });
+
+        delete_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search_text.setText("");
+                InputMethodManager imm=(InputMethodManager)getContext().getSystemService(
+                        getContext().INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(0,InputMethodManager.HIDE_NOT_ALWAYS);
+                queryProvinces();
+            }
+        });
+
+        search_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Ifly.Dialoginit(getActivity(),search_text);
+            }
+        });
     }
+
+    /**
+     * 根据关键字查找城市
+     * @param key
+     */
+    private void search(String key){
+       countyList=DataSupport.where("countyName=?",
+               key).find(County.class);
+        if(countyList.size()>0){
+            dataList.clear();
+            for(County county:countyList){
+                dataList.add(county.getCountyName());
+            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.notifyDataSetChanged();
+                    listView.setSelection(0);
+                }
+            });
+            currentLevel=LEVEL_COUNTY;
+        }else{
+            String address="https://api.heweather.com/v5/search?" +
+                    "city="+key+"&key=3641ea7c9cde405daa16d2cc80a60ec0";
+            HttpUtil.sendOkHttpRequest(address, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(),"查询失败",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responseText=response.body().string();
+                    Weather weather= Utility.handleWeatherResponse(responseText);
+                    StringBuffer city=new StringBuffer();
+                    if(weather.status=="ok"){
+                        city.append(weather.basic.cityName).
+                                append(",").append(weather.basic.prov).
+                                append(",").append(weather.basic.cnty);
+                        selectWeather=weather;
+                    }else{
+                        city.append("没有匹配的结果");
+                        selectWeather=null;
+                    }
+                    dataList.clear();
+                    dataList.add(city.toString());
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                            listView.setSelection(0);
+                        }
+                    });
+                    currentLevel=LEVEL_SEARCH;
+                }
+            });
+        }
+    }
+
 
     /**
      * 显示进度对话框
@@ -295,7 +456,7 @@ public class ChooseAreaFragment extends Fragment {
         }
     }
 
-    public class MyAdapter extends BaseAdapter{
+    public  class MyAdapter extends BaseAdapter{
 
         private LayoutInflater layoutInflater=LayoutInflater.from(MyApplication.getContext());
 
