@@ -46,6 +46,8 @@ public class ViewPagerFragment extends FragmentActivity {
 
     private Boolean status_notification;
 
+    private String cityName;
+
     public static NotificationManager manager;
 
     public static ViewPager getViewPager(){
@@ -77,13 +79,11 @@ public class ViewPagerFragment extends FragmentActivity {
         status_notification= SharePrefsManager.getBoolean("status_notification");
 
         if(status_notification){
-            String cityName=ids.split(",")[0].split("/")[1];
             Log.w("city",cityName);
             postNotification(cityName);
         }
 
     }
-
 
 
     @Override
@@ -96,6 +96,7 @@ public class ViewPagerFragment extends FragmentActivity {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String ids=prefs.getString("weatherIds",null);
         if(ids!=null){
+             cityName=ids.split(",")[0].split("/")[1];
             if(ids.contains(",")){
                 List<String> weathers=Arrays.asList(ids.split(","));
                 for(String weather:weathers){
@@ -122,14 +123,6 @@ public class ViewPagerFragment extends FragmentActivity {
              viewPager.setCurrentItem(0);
          }
 
-        status_notification= SharePrefsManager.getBoolean("status_notification");
-
-        if(status_notification){
-            String cityName=ids.split(",")[0].split("/")[1];
-            Log.w("city",cityName);
-                postNotification(cityName);
-            }
-
 
 
         /**
@@ -147,6 +140,17 @@ public class ViewPagerFragment extends FragmentActivity {
             numLayout.addView(button);
         }
          */
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        status_notification= SharePrefsManager.getBoolean("status_notification");
+
+        if(status_notification){
+            Log.w("city",cityName);
+            postNotification(cityName);
+        }
     }
 
     public void postNotification(String cityName) {
@@ -175,6 +179,10 @@ public class ViewPagerFragment extends FragmentActivity {
                 case "大雨":
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
                             R.mipmap.heavy_rain));
+                    break;
+                case "阵雨":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.shower));
                     break;
                 case "雷阵雨":
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),

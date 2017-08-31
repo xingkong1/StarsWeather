@@ -24,7 +24,7 @@ public class SharePrefsManager {
     }
 
     public static boolean getBoolean(String key){
-        return preferences.getBoolean(key,true);
+        return preferences.getBoolean(key,false);
     }
 
     public static void setBoolean(String key, Boolean value){
