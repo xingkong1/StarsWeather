@@ -2,9 +2,11 @@ package com.xingkong.starsweather;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -15,9 +17,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.xingkong.starsweather.util.MyApplication;
+import com.xingkong.starsweather.util.SharePrefsManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +44,9 @@ public class ViewPagerFragment extends FragmentActivity {
 
     private List<String> countyNames;
 
-    public  NotificationManager manager;
+    private Boolean status_notification;
+
+    public static NotificationManager manager;
 
     public static ViewPager getViewPager(){
         return viewPager;
@@ -68,6 +74,14 @@ public class ViewPagerFragment extends FragmentActivity {
             adapter.updateDate(weatherList);
         }
 
+        status_notification= SharePrefsManager.getBoolean("status_notification");
+
+        if(status_notification){
+            String cityName=ids.split(",")[0].split("/")[1];
+            Log.w("city",cityName);
+            postNotification(cityName);
+        }
+
     }
 
 
@@ -76,6 +90,8 @@ public class ViewPagerFragment extends FragmentActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpager);
+        manager=(NotificationManager)getSystemService(
+                Context.NOTIFICATION_SERVICE);
         weatherIds=new ArrayList<>();
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String ids=prefs.getString("weatherIds",null);
@@ -106,6 +122,14 @@ public class ViewPagerFragment extends FragmentActivity {
              viewPager.setCurrentItem(0);
          }
 
+        status_notification= SharePrefsManager.getBoolean("status_notification");
+
+        if(status_notification){
+            String cityName=ids.split(",")[0].split("/")[1];
+            Log.w("city",cityName);
+                postNotification(cityName);
+            }
+
 
 
         /**
@@ -124,6 +148,55 @@ public class ViewPagerFragment extends FragmentActivity {
         }
          */
     }
+
+    public void postNotification(String cityName) {
+        String weather = SharePrefsManager.getString(cityName);
+        String weatherInfo = weather.split(",")[0];
+        String degree = weather.split(",")[1];
+        String range=weather.split(",")[2];
+        if (manager != null) {
+            Intent intent = new Intent(this, ViewPagerFragment.class);
+            PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
+            NotificationCompat.Builder builder = new NotificationCompat.
+                    Builder(this);
+            switch (weatherInfo) {
+                case "晴":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.sunny));
+                    break;
+                case "多云":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.cloudy));
+                    break;
+                case "阴":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.cloudy));
+                    break;
+                case "大雨":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.heavy_rain));
+                    break;
+                case "雷阵雨":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.thundershower));
+                    break;
+                case "雪":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.snow));
+                    break;
+            }
+            builder.setContentTitle(degree+"  "+range);
+            builder.setContentText(weatherInfo);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentInfo(cityName);
+            builder.setSmallIcon(R.mipmap.biaozhi);
+            builder.setContentIntent(pi);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_NO_CLEAR;
+            manager.notify(1, notification);
+        }
+    }
+
 
     public  void  add(String weatherId){
          weatherIds.add(weatherId);

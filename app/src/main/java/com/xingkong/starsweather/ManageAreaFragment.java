@@ -30,6 +30,7 @@ import com.xingkong.starsweather.db.Province;
 import com.xingkong.starsweather.service.AutoUpdateService;
 import com.xingkong.starsweather.util.HttpUtil;
 import com.xingkong.starsweather.util.MyApplication;
+import com.xingkong.starsweather.util.SharePrefsManager;
 import com.xingkong.starsweather.util.Utility;
 
 import org.litepal.crud.DataSupport;
@@ -158,6 +159,7 @@ public class ManageAreaFragment extends Fragment {
                             }
                             SharedPreferences.Editor edit= prefs.edit();
                             edit.putString("weatherIds",weatherIds);
+                            edit.putString(countyName,null);
                             edit.commit();
                             dataList.remove(position);
                             adapter.notifyDataSetChanged();
@@ -292,9 +294,9 @@ public class ManageAreaFragment extends Fragment {
             }else{
                 dataList.add(weatherIds.split("/")[1]);
             }
+            currentLevel=LEVEL_MANAGER;
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            currentLevel=LEVEL_MANAGER;
         }
     }
 
@@ -310,9 +312,9 @@ public class ManageAreaFragment extends Fragment {
                 dataList.add(province.getProvinceName());
                 Log.w("province",province.getProvinceName());
             }
+            currentLevel=LEVEL_PROVINCE;
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            currentLevel=LEVEL_PROVINCE;
         }else {
             String address="http://guolin.tech/api/china";
             queryFormServer(address,"province");
@@ -332,9 +334,9 @@ public class ManageAreaFragment extends Fragment {
             for(City city:cityList){
                 dataList.add(city.getCityName());
             }
+            currentLevel=LEVEL_CITY;
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            currentLevel=LEVEL_CITY;
         }else{
             int provinceCode=selectedProvince.getProvinceCode();
             String address="http://guolin.tech/api/china/"+provinceCode;
@@ -396,10 +398,42 @@ public class ManageAreaFragment extends Fragment {
                 viewHolder.image=(ImageView)convertView.findViewById(R.id.city_image);
                 viewHolder.text=(TextView)convertView.findViewById(R.id.city_name);
                 convertView.setTag(viewHolder);
+                viewHolder.text.setText(dataList.get(position));
+                if(currentLevel==LEVEL_MANAGER){
+                   String weather=SharePrefsManager.getString(dataList.get(position));
+                    if(weather!=null){
+                        String[] weathers=weather.split(",");
+                        viewHolder.text.setText(dataList.get(position)
+                                +"                  "+weathers[1]);
+                        switch (weathers[0]){
+                            case "晴":
+                                viewHolder.image.setImageResource(R.drawable.sunny);
+                                break;
+                            case "多云":
+                                viewHolder.image.setImageResource(R.drawable.cloudy);
+                                break;
+                            case "阴":
+                                viewHolder.image.setImageResource(R.drawable.yintian);
+                                break;
+                            case "大雨":
+                                viewHolder.image.setImageResource(R.drawable.heavy_rain);
+                                break;
+                            case "雷阵雨":
+                                viewHolder.image.setImageResource(R.drawable.thundershower);
+                                break;
+                            case "雪":
+                                viewHolder.image.setImageResource(R.drawable.snow);
+                                break;
+
+                        }
+                    }
+                }
+
             }else{
                 viewHolder=(ViewHolder)convertView.getTag();
+                viewHolder.text.setText(dataList.get(position));
             }
-            viewHolder.text.setText(dataList.get(position));
+
             return convertView;
         }
     }

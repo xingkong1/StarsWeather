@@ -24,6 +24,10 @@ public class SettingActivity extends AppCompatActivity {
     private ImageView image_voice;
     private boolean status_voice;
 
+    private LinearLayout setting_notification;
+    private ImageView image_notification;
+    private Boolean status_notification;
+
     private LinearLayout setting_service;
     private ImageView image_service;
     private Boolean status_service;
@@ -46,17 +50,19 @@ public class SettingActivity extends AppCompatActivity {
 
         setting_interval=(LinearLayout)findViewById(R.id.setting_interval);
         text_interval=(TextView)findViewById(R.id.interval_text) ;
-
         back=(Button)findViewById(R.id.settingBack_button);
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
+
         image_voice=(ImageView)findViewById(R.id.image_voice);
         setting_voice=(LinearLayout)findViewById(R.id.setting_voice);
         status_voice= SharePrefsManager.getBoolean("status_voice");
+
         if(status_voice){
             image_voice.setImageResource(R.drawable.slip_open);
         }else{
@@ -75,6 +81,32 @@ public class SettingActivity extends AppCompatActivity {
                     SharePrefsManager.setBoolean("status_voice",status_voice);
                 }
                 return false;
+            }
+        });
+
+        setting_notification=(LinearLayout)findViewById(R.id.setting_notification);
+        image_notification=(ImageView)findViewById(R.id.image_notification);
+        status_notification=SharePrefsManager.getBoolean("status_notification");
+
+        if(status_notification){
+            image_notification.setImageResource(R.drawable.slip_open);
+        }else{
+            image_notification.setImageResource(R.drawable.slip_close);
+        }
+
+        setting_notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(status_notification){
+                    image_notification.setImageResource(R.drawable.slip_close);
+                    status_notification=false;
+                    SharePrefsManager.setBoolean("status_notification",status_notification);
+                    ViewPagerFragment.manager.cancelAll();
+                }else{
+                    image_notification.setImageResource(R.drawable.slip_open);
+                    status_notification=true;
+                    SharePrefsManager.setBoolean("status_notification",status_notification);
+                }
             }
         });
 
