@@ -151,8 +151,6 @@ public class ChooseAreaFragment extends Fragment {
                         edit.putString("weatherIds",weatherId+"/"+countyName);
                         edit.commit();
                         startActivity(intent);
-                        Intent intent1=new Intent(getActivity(), AutoUpdateService.class);
-                        getActivity().startService(intent1);
                         getActivity().finish();
                     }else if(getActivity() instanceof AddAreaActivity){
                         Intent intent=new Intent(getActivity(),ViewPagerFragment.class);

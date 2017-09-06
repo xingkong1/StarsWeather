@@ -60,8 +60,6 @@ public class WeatherFragment extends Fragment {
 
     private ScrollView weatherLayout;
 
-    private TextView titleCity;
-
     private TextView titleUpdateTime;
 
     private  TextView degreeText;
@@ -91,8 +89,6 @@ public class WeatherFragment extends Fragment {
     public SwipeRefreshLayout swipeRefreshLayout;
 
     public DrawerLayout drawerLayout;
-
-    private Button navButton;
 
     private View view;
 
@@ -145,7 +141,6 @@ public class WeatherFragment extends Fragment {
         SpeechUtility.createUtility(getActivity(), SpeechConstant.APPID + "=59993311");
         ifly=new Ifly();
         weatherLayout=(ScrollView)view.findViewById(R.id.weather_layout);
-        titleCity=(TextView)view.findViewById(R.id.title_city);
         titleUpdateTime=(TextView)view.findViewById(R.id.title_update_time);
         degreeText=(TextView)view.findViewById(R.id.degree_text);
         weatherInfoText=(TextView)view.findViewById(R.id.weather_info_text);
@@ -165,8 +160,7 @@ public class WeatherFragment extends Fragment {
         swipeRefreshLayout=(SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
 
-        drawerLayout=(DrawerLayout)view.findViewById(R.id.drawer_layout);
-        navButton=(Button)view.findViewById(R.id.nav_button);
+        drawerLayout=(DrawerLayout)(getActivity().findViewById(R.id.drawer_layout));
 
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String weatherString=prefs.getString("weather_"+weatherId,null);
@@ -194,15 +188,10 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onRefresh() {
                 requestWeather(weatherId);
+                loadBingPic();
             }
         });
-        navButton.setOnClickListener(new View.OnClickListener(){
 
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
 
         Boolean status_voice= SharePrefsManager.getBoolean("status_voice");
         if(!status_voice){
@@ -342,13 +331,13 @@ public class WeatherFragment extends Fragment {
             if (weather.aqi.city.qlty != null && !"".equals(weather.aqi.city.qlty)) {
                 air = air + "空气质量：" + weather.aqi.city.qlty;
             }
-            weather_air.setText(air);
+
         }
+        weather_air.setText(air);
         String max=weather.forecastList.get(0).temperature.max;
         String min=weather.forecastList.get(0).temperature.min;
         String range=max+"°"+"/"+min+"°";
         temRange.setText(range);
-        titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
@@ -368,6 +357,9 @@ public class WeatherFragment extends Fragment {
             case "雷阵雨":
                 now_image.setImageResource(R.drawable.thundershower);
                 break;
+            case "阵雨":
+                now_image.setImageResource(R.drawable.shower);
+                break;
             case "雪":
                 now_image.setImageResource(R.drawable.snow);
                 break;
@@ -375,6 +367,7 @@ public class WeatherFragment extends Fragment {
         }
 
         forecastLayout.removeAllViews();
+
         for(int i=1;i<weather.forecastList.size();i++){
             Forecast forecast=weather.forecastList.get(i);
             View view= LayoutInflater.from(getContext()).inflate(

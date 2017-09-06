@@ -421,6 +421,9 @@ public class ManageAreaFragment extends Fragment {
                             case "雷阵雨":
                                 viewHolder.image.setImageResource(R.drawable.thundershower);
                                 break;
+                            case "阵雨":
+                                viewHolder.image.setImageResource(R.drawable.shower);
+                                break;
                             case "雪":
                                 viewHolder.image.setImageResource(R.drawable.snow);
                                 break;

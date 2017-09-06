@@ -9,7 +9,7 @@
         android:id="@+id/title_frame"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimaryDark">
+        android:background="#6699ff">
 
         <TextView
             android:id="@+id/title_text"

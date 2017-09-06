@@ -16,9 +16,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.xingkong.starsweather.util.MyApplication;
 import com.xingkong.starsweather.util.SharePrefsManager;
@@ -26,6 +32,7 @@ import com.xingkong.starsweather.util.SharePrefsManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by yanghongtao on 2017/8/22 0022.
@@ -33,6 +40,12 @@ import java.util.List;
 
 public class ViewPagerFragment extends FragmentActivity {
 
+
+    private TextView titleCity;
+
+    private Button navButton;
+
+    public DrawerLayout drawerLayout;
 
     private static ViewPager viewPager;
 
@@ -57,7 +70,9 @@ public class ViewPagerFragment extends FragmentActivity {
         super.onRestart();
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String ids=prefs.getString("weatherIds",null);
+
         List<String> weatherList=new ArrayList<>();
+
         if(ids!=null){
             if(ids.contains(",")){
                 List<String> weathers=Arrays.asList(ids.split(","));
@@ -74,6 +89,7 @@ public class ViewPagerFragment extends FragmentActivity {
             adapter.updateDate(weatherList);
         }
 
+
         status_notification= SharePrefsManager.getBoolean("status_notification");
 
         if(status_notification){
@@ -81,6 +97,8 @@ public class ViewPagerFragment extends FragmentActivity {
             Log.w("city",cityName);
             postNotification(cityName);
         }
+
+
 
     }
 
@@ -90,9 +108,15 @@ public class ViewPagerFragment extends FragmentActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpager);
+
+        titleCity=(TextView)findViewById(R.id.title_city);
+        navButton=(Button)findViewById(R.id.nav_button);
+        drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
+
         manager=(NotificationManager)getSystemService(
                 Context.NOTIFICATION_SERVICE);
         weatherIds=new ArrayList<>();
+        countyNames=new ArrayList<>();
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String ids=prefs.getString("weatherIds",null);
         if(ids!=null){
@@ -100,9 +124,11 @@ public class ViewPagerFragment extends FragmentActivity {
                 List<String> weathers=Arrays.asList(ids.split(","));
                 for(String weather:weathers){
                     weatherIds.add(weather.split("/")[0]);
+                    countyNames.add(weather.split("/")[1]);
                 }
             }else{
                 weatherIds.add(ids.split("/")[0]);
+                countyNames.add(ids.split("/")[1]);
             }
         }
 
@@ -117,9 +143,12 @@ public class ViewPagerFragment extends FragmentActivity {
         String position=getIntent().getStringExtra("position");
 
          if(position!=null){
-             viewPager.setCurrentItem(weatherIds.indexOf(position));
+            int p= weatherIds.indexOf(position);
+             viewPager.setCurrentItem(p);
+             titleCity.setText(countyNames.get(p));
          }else{
              viewPager.setCurrentItem(0);
+             titleCity.setText(countyNames.get(0));
          }
 
         status_notification= SharePrefsManager.getBoolean("status_notification");
@@ -129,6 +158,31 @@ public class ViewPagerFragment extends FragmentActivity {
             Log.w("city",cityName);
                 postNotification(cityName);
             }
+
+        navButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                   titleCity.setText(countyNames.get(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
 
 
@@ -179,6 +233,10 @@ public class ViewPagerFragment extends FragmentActivity {
                 case "雷阵雨":
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
                             R.mipmap.thundershower));
+                    break;
+                case "阵雨":
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.mipmap.shower));
                     break;
                 case "雪":
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),

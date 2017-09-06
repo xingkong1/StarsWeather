@@ -24,11 +24,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent=new Intent(this,ViewPagerFragment.class);
             startActivity(intent);
             finish();
-           /** if(SharePrefsManager.getBoolean("status_service")){
+            if(SharePrefsManager.getBoolean("status_service")){
                 Intent intent1=new Intent(this, AutoUpdateService.class);
                  startService(intent1);
             }
-            */
         }
     }
 }
