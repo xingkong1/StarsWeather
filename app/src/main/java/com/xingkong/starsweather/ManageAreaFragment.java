@@ -404,7 +404,7 @@ public class ManageAreaFragment extends Fragment {
                     if(weather!=null){
                         String[] weathers=weather.split(",");
                         viewHolder.text.setText(dataList.get(position)
-                                +"                  "+weathers[1]);
+                                +"                           "+weathers[1]);
                         switch (weathers[0]){
                             case "晴":
                                 viewHolder.image.setImageResource(R.drawable.sunny);
@@ -417,6 +417,9 @@ public class ManageAreaFragment extends Fragment {
                                 break;
                             case "大雨":
                                 viewHolder.image.setImageResource(R.drawable.heavy_rain);
+                                break;
+                            case "阵雨":
+                                viewHolder.image.setImageResource(R.drawable.shower);
                                 break;
                             case "雷阵雨":
                                 viewHolder.image.setImageResource(R.drawable.thundershower);

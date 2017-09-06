@@ -289,9 +289,10 @@ public class ChooseAreaFragment extends Fragment {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String responseText=response.body().string();
+                    Log.w("search",responseText);
                     Weather weather= Utility.handleWeatherResponse(responseText);
                     StringBuffer city=new StringBuffer();
-                    if(weather.status=="ok"){
+                    if("ok".equals(weather.status.trim())){
                         city.append(weather.basic.cityName).
                                 append(",").append(weather.basic.prov).
                                 append(",").append(weather.basic.cnty);
@@ -301,6 +302,7 @@ public class ChooseAreaFragment extends Fragment {
                         selectWeather=null;
                     }
                     dataList.clear();
+                    Log.w("search",city.toString());
                     dataList.add(city.toString());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override

@@ -354,6 +354,9 @@ public class WeatherFragment extends Fragment {
             case "大雨":
                 now_image.setImageResource(R.drawable.heavy_rain);
                 break;
+            case "阵雨":
+                now_image.setImageResource(R.drawable.shower);
+                break;
             case "雷阵雨":
                 now_image.setImageResource(R.drawable.thundershower);
                 break;
