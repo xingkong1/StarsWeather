@@ -3,14 +3,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#6699ff"
+        android:background="#00000000"
         android:id="@+id/weather_fragment">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/bing_pic_img"
-        android:scaleType="centerCrop"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"

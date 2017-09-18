@@ -84,8 +84,6 @@ public class WeatherFragment extends Fragment {
 
     private TextView temRange;
 
-    private ImageView bingPicImg;
-
     public SwipeRefreshLayout swipeRefreshLayout;
 
     public DrawerLayout drawerLayout;
@@ -153,7 +151,6 @@ public class WeatherFragment extends Fragment {
         comfortBrf=(TextView)view.findViewById(R.id.comfort_brf);
         drsgBrf=(TextView)view.findViewById(R.id.drsg_brf);
         sportBrf=(TextView)view.findViewById(R.id.sport_brf);
-        bingPicImg=(ImageView)view.findViewById(R.id.bing_pic_img);
         now_image=(ImageView)view.findViewById(R.id.now_image);
         forecast_image=(ImageView)view.findViewById(R.id.forecast_image);
 
@@ -164,12 +161,7 @@ public class WeatherFragment extends Fragment {
 
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext());
         String weatherString=prefs.getString("weather_"+weatherId,null);
-        String bingPic=prefs.getString("bing_pic",null);
-        if(bingPic!=null){
-            Glide.with(this).load(bingPic).into(bingPicImg);
-        }else{
-            loadBingPic();
-        }
+
         if(weatherString!=null){
             //有缓存时直接解析天气数据
             weather= Utility.handleWeatherResponse(weatherString);
@@ -188,7 +180,7 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onRefresh() {
                 requestWeather(weatherId);
-                loadBingPic();
+                //loadBingPic();
             }
         });
 
@@ -229,44 +221,7 @@ public class WeatherFragment extends Fragment {
 
 
 
-    /**
-     * jiaz必应每日一图
-     */
-    private void loadBingPic(){
-        String requestBingPic="https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1";
-        final String baseUrl="http://cn.bing.com";
-        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String bingPic=response.body().string();
-                String pic="";
-                try{
-                    JSONObject jsonObject=new JSONObject(bingPic);
-                    JSONArray jsonArray= jsonObject.getJSONArray("images");
-                    String url=jsonArray.getJSONObject(0).getString("url");
-                    pic=baseUrl+url;
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                final  String image=pic;
-                SharedPreferences.Editor editor=PreferenceManager.
-                        getDefaultSharedPreferences(getActivity()).edit();
-                editor.putString("bing_pic",image);
-                editor.apply();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Glide.with(getActivity()).load(image).into(bingPicImg);
-                    }
-                });
-            }
-        });
-    }
 
     /**
      * 根据天气id请求城市天气信息
@@ -359,9 +314,6 @@ public class WeatherFragment extends Fragment {
                 break;
             case "雷阵雨":
                 now_image.setImageResource(R.drawable.thundershower);
-                break;
-            case "阵雨":
-                now_image.setImageResource(R.drawable.shower);
                 break;
             case "雪":
                 now_image.setImageResource(R.drawable.snow);

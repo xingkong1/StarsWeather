@@ -121,7 +121,7 @@ public class WeatherActivity extends AppCompatActivity {
         comfortBrf=(TextView)findViewById(R.id.comfort_brf);
         drsgBrf=(TextView)findViewById(R.id.drsg_brf);
         sportBrf=(TextView)findViewById(R.id.sport_brf);
-        bingPicImg=(ImageView)findViewById(R.id.bing_pic_img);
+        //bingPicImg=(ImageView)findViewById(R.id.bing_pic_img);
         now_image=(ImageView)findViewById(R.id.now_image);
         forecast_image=(ImageView)findViewById(R.id.forecast_image);
 

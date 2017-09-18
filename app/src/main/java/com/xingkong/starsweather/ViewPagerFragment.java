@@ -23,16 +23,27 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.xingkong.starsweather.util.HttpUtil;
 import com.xingkong.starsweather.util.MyApplication;
 import com.xingkong.starsweather.util.SharePrefsManager;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by yanghongtao on 2017/8/22 0022.
@@ -60,6 +71,8 @@ public class ViewPagerFragment extends FragmentActivity {
     private Boolean status_notification;
 
     private String cityName;
+
+    private ImageView bingPicImg;
 
     public static NotificationManager manager;
 
@@ -112,6 +125,7 @@ public class ViewPagerFragment extends FragmentActivity {
         titleCity=(TextView)findViewById(R.id.title_city);
         navButton=(Button)findViewById(R.id.nav_button);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
+        bingPicImg=(ImageView)findViewById(R.id.bing_pic_img);
 
         manager=(NotificationManager)getSystemService(
                 Context.NOTIFICATION_SERVICE);
@@ -133,6 +147,14 @@ public class ViewPagerFragment extends FragmentActivity {
             }
         }
 
+        String bingPic=prefs.getString("bing_pic",null);
+
+        if(bingPic!=null){
+            Glide.with(this).load(bingPic).into(bingPicImg);
+        }else{
+            loadBingPic();
+        }
+
         viewPager=(ViewPager)findViewById(R.id.viewPager);
 
         viewPager.setOffscreenPageLimit(6);
@@ -152,7 +174,6 @@ public class ViewPagerFragment extends FragmentActivity {
              titleCity.setText(countyNames.get(0));
          }
 
-<<<<<<< HEAD
         status_notification= SharePrefsManager.getBoolean("status_notification");
 
         if(status_notification){
@@ -186,9 +207,6 @@ public class ViewPagerFragment extends FragmentActivity {
             }
         });
 
-=======
->>>>>>> d355534b9f90453c19bdfe8e92d05b9cfa5fdc1e
-
 
         /**
         FrameLayout viewGroup= (FrameLayout) (LayoutInflater.from(MyApplication.getContext()).inflate(R.layout.activity_weather,null));
@@ -205,6 +223,42 @@ public class ViewPagerFragment extends FragmentActivity {
             numLayout.addView(button);
         }
          */
+    }
+
+    /**
+     * 加载必应每日一图
+     */
+    private void loadBingPic(){
+        String requestBingPic="https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1";
+        final String baseUrl="http://cn.bing.com";
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String bingPic=response.body().string();
+                String pic="";
+                try{
+                    JSONObject jsonObject=new JSONObject(bingPic);
+                    JSONArray jsonArray= jsonObject.getJSONArray("images");
+                    String url=jsonArray.getJSONObject(0).getString("url");
+                    pic=baseUrl+url;
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                final  String image=pic;
+                SharePrefsManager.set("bing_pic",image);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Glide.with(ViewPagerFragment.this).load(image).into(bingPicImg);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -244,10 +298,6 @@ public class ViewPagerFragment extends FragmentActivity {
                 case "大雨":
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
                             R.mipmap.heavy_rain));
-                    break;
-                case "阵雨":
-                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                            R.mipmap.shower));
                     break;
                 case "雷阵雨":
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),
